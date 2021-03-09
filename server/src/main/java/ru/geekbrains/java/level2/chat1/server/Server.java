@@ -1,4 +1,4 @@
-package ru.geekbrains.java.level2.chat2.server;
+package ru.geekbrains.java.level2.chat1.server;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
