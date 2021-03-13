@@ -22,6 +22,7 @@ public class InStreamHandler implements Runnable {
     public HBox sendMsgBox;
 
     public InStreamHandler (TextArea msgArea, DataInputStream in, Socket socket, HBox loginBox, HBox sendMsgBox, TextField loginField, TextField msgField) {
+
         this.msgArea = msgArea;
         this.in = in;
         this.socket = socket;
@@ -29,6 +30,7 @@ public class InStreamHandler implements Runnable {
         this.sendMsgBox = sendMsgBox;
         this.loginField = loginField;
         this.msgField = msgField;
+
     }
 
 
@@ -77,20 +79,26 @@ public class InStreamHandler implements Runnable {
      * @param msg
      */
     private void normalMsgHandler (String msg) {
+
         msgArea.appendText(msg + "\n");
+
     }
 
     private void loginMsgHandler(String msg) {
         String trueFalse = msg.split("_")[1];
+
         String login = msg.split("_")[2];
+
         if (trueFalse.equals("true")) {
             sendMsgBox.setVisible(true);
             sendMsgBox.setManaged(true);
             loginBox.setVisible(false);
             loginBox.setManaged(false);
+
             msgField.setPromptText("Вы подключены под логином " + login + ", введите сообщение");
         } else {
             loginField.setPromptText("Логин " + login + " занят, выберете другой логин");
+
         }
     }
 }

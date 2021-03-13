@@ -72,7 +72,6 @@ public class Server {
         System.out.println("Клиент " + clientHandler.getSocket().getRemoteSocketAddress() + " залогинился, логин: " + login);
         return true;
     }
-
     public synchronized void sendBroadcastMsg(String msg) {
         for (ClientHandler client: clientList) {
             if (!client.getLogin().equals("")) {

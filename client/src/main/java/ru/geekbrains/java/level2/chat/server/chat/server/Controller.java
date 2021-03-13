@@ -41,7 +41,7 @@ public class Controller implements Initializable {
         } catch (IOException e) {
             Alert alert = new Alert(Alert.AlertType.ERROR, "невозможно отправить сообщение", ButtonType.OK);
             alert.showAndWait();
-            closeConnection(e);
+
         }
     }
 
@@ -52,7 +52,6 @@ public class Controller implements Initializable {
         } catch (IOException e) {
             Alert alert = new Alert(Alert.AlertType.ERROR, "невозможно отправить сообщение", ButtonType.OK);
             alert.showAndWait();
-            closeConnection(e);
         }
     }
 
@@ -73,16 +72,7 @@ public class Controller implements Initializable {
         } catch (IOException e) {
             throw new RuntimeException("Unable to connect to server localhost:8189");
         }
-        new Thread(new InStreamHandler(msgArea, in, socket, loginBox, sendMsgBox, loginField, msgField)).start();
-    }
-
-    private void closeConnection(IOException e) {
-        e.printStackTrace();
-        try {
-            socket.close();
-        } catch (IOException ioException) {
-            ioException.printStackTrace();
-        }
+        new Thread(new InStreamHandler(msgArea, in, socket, loginBox, sendMsgBox, loginField)).start();
     }
 
 
