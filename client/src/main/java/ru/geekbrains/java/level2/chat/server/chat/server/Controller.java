@@ -72,7 +72,7 @@ public class Controller implements Initializable {
         } catch (IOException e) {
             throw new RuntimeException("Unable to connect to server localhost:8189");
         }
-        new Thread(new InStreamHandler(msgArea, in, socket, loginBox, sendMsgBox, loginField)).start();
+        new Thread(new InStreamHandler(msgArea, in, socket, loginBox, sendMsgBox, loginField, msgField)).start();
     }
 
 
