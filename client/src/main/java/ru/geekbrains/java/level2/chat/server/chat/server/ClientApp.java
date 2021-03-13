@@ -1,4 +1,4 @@
-package ru.geekbrains.java.level2.chat.server;
+package ru.geekbrains.java.level2.chat.server.chat.server;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -6,12 +6,17 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-public class Main extends Application {
+import java.io.FileWriter;
+
+public class ClientApp extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception{
-        Parent root = FXMLLoader.load(getClass().getResource("/window.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/window.fxml"));
+        Parent root = loader.load();
         primaryStage.setTitle("Chat");
+        Controller controller = loader.getController();
+        primaryStage.setOnHidden(e -> controller.onStageClose());
         primaryStage.setScene(new Scene(root, 400, 400));
         primaryStage.show();
     }
