@@ -4,10 +4,16 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.Button?>
-<VBox fx:controller="ru.geekbrains.java.level2.chat.server.Controller"
+<VBox fx:controller="ru.geekbrains.java.level2.chat.server.chat.server.Controller"
       xmlns:fx="http://javafx.com/fxml" alignment="center">
+    <HBox fx:id="loginBox">
+        <TextField fx:id="loginField" HBox.hgrow="ALWAYS" promptText="Введите login"/>
+        <!--
+        <Button onAction="#send" text="Отправить"/>-->
+        <Button onAction="#login" text="login"/>
+    </HBox>
     <TextArea fx:id="msgArea" VBox.vgrow="ALWAYS" editable="false" />
-    <HBox>
+    <HBox fx:id="sendMsgBox" visible="false" managed="false">
         <TextField fx:id="msgField" HBox.hgrow="ALWAYS" promptText="Введите сообщение"/>
 <!--
 <Button onAction="#send" text="Отправить"/>-->
