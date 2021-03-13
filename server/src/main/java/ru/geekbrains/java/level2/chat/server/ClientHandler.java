@@ -30,6 +30,10 @@ public class ClientHandler implements Runnable{
 
     }
 
+    public DataOutputStream getOut() {
+        return out;
+    }
+
     public String getLogin() {
         return login;
     }
@@ -80,7 +84,7 @@ public class ClientHandler implements Runnable{
     }
 
     private void normalMsgHandler (String msg) {
-
+        server.sendBroadcastMsg(getLogin() + " -> " + msg);
     }
 
     private void loginMsgHandler(String msg) {
@@ -106,14 +110,14 @@ public class ClientHandler implements Runnable{
      * Печатает StackTrace
      * @param e
      */
-    private void closeConnection (IOException e) {
+    public void closeConnection (IOException e) {
         e.printStackTrace();
         try {
             socket.close();
         } catch (IOException ioException) {
             ioException.printStackTrace();
         }
-        System.out.println("соединение с клиентом " + socket.getRemoteSocketAddress() + " разорвано");
+        System.out.println("соединение с клиентом " + socket.getRemoteSocketAddress() + " разорвано, socket закрыт");
         server.removeClientHandlerFromList(this);
     }
 }

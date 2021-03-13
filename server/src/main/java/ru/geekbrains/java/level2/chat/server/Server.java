@@ -39,7 +39,7 @@ public class Server {
     }
 
     /**
-     * Добавляет clientHandler в списое
+     * Добавляет clientHandler в списое при подключении
      * @param clientHandler
      */
     public void addClientHandlerToList (ClientHandler clientHandler) {
@@ -47,7 +47,8 @@ public class Server {
     }
 
     /**
-     * Удаляет clientHandler из списка
+     * Удаляет clientHandler из списка при разрыве соединения с клиентом
+     * вызываетсся из clientHandler
      * @param clientHandler
      */
     public void removeClientHandlerFromList (ClientHandler clientHandler) {
@@ -59,6 +60,7 @@ public class Server {
      * Проверяет есть ли уже такой логин, если есть
      * возвращает false, если нет присваивает clientHandler логин
      * и возвращает true
+     * вызываетсся из clientHandler
      */
     public synchronized boolean checkLogin (ClientHandler clientHandler, String login) {
         for (ClientHandler client: clientList) {
@@ -69,5 +71,17 @@ public class Server {
         clientHandler.setLogin(login);
         System.out.println("Клиент " + clientHandler.getSocket().getRemoteSocketAddress() + " залогинился, логин: " + login);
         return true;
+    }
+
+    public synchronized void sendBroadcastMsg(String msg) {
+        for (ClientHandler client: clientList) {
+            if (!client.getLogin().equals("")) {
+                try {
+                    client.getOut().writeUTF(msg);
+                } catch (IOException e) {
+                    client.closeConnection(e);
+                }
+            }
+        }
     }
 }

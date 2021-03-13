@@ -21,13 +21,14 @@ public class InStreamHandler implements Runnable {
     public HBox loginBox;
     public HBox sendMsgBox;
 
-    public InStreamHandler (TextArea msgArea, DataInputStream in, Socket socket, HBox loginBox, HBox sendMsgBox, TextField loginField) {
+    public InStreamHandler (TextArea msgArea, DataInputStream in, Socket socket, HBox loginBox, HBox sendMsgBox, TextField loginField, TextField msgField) {
         this.msgArea = msgArea;
         this.in = in;
         this.socket = socket;
         this.loginBox = loginBox;
         this.sendMsgBox = sendMsgBox;
         this.loginField = loginField;
+        this.msgField = msgField;
     }
 
 
@@ -36,7 +37,7 @@ public class InStreamHandler implements Runnable {
         try {
             while (true) {
                 String msg = in.readUTF();
-                msgArea.appendText(msg + "\n");
+
                 if (msg.startsWith("/")) {
                     serviceMsgHandler(msg);
                 } else {
@@ -76,18 +77,20 @@ public class InStreamHandler implements Runnable {
      * @param msg
      */
     private void normalMsgHandler (String msg) {
-
+        msgArea.appendText(msg + "\n");
     }
 
     private void loginMsgHandler(String msg) {
         String trueFalse = msg.split("_")[1];
+        String login = msg.split("_")[2];
         if (trueFalse.equals("true")) {
             sendMsgBox.setVisible(true);
             sendMsgBox.setManaged(true);
             loginBox.setVisible(false);
             loginBox.setManaged(false);
+            msgField.setPromptText("Вы подключены под логином " + login + ", введите сообщение");
         } else {
-            loginField.setPromptText("Логин " + msg.split("_")[2] + " занят, выберете другой логин");
+            loginField.setPromptText("Логин " + login + " занят, выберете другой логин");
         }
     }
 }
