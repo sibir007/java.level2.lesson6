@@ -8,6 +8,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 
 
 import java.io.DataInputStream;
@@ -22,7 +23,7 @@ public class Controller implements Initializable {
     @FXML
     public HBox loginBox;
     @FXML
-    public HBox sendMsgBox;
+    public VBox sendMsgBox;
     @FXML
     private TextField msgField;
     @FXML
@@ -45,7 +46,11 @@ public class Controller implements Initializable {
         }
     }
 
-    public void login(ActionEvent actionEvent) {
+    public void logging(ActionEvent actionEvent) {
+        if (loginField.getText().isEmpty()) {
+            loginField.setPromptText("Логин не должен быть пустой");
+            return;
+        }
         try {
             out.writeUTF("/login_" + loginField.getText());
             loginField.clear();

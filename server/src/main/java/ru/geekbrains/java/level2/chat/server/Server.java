@@ -39,7 +39,7 @@ public class Server {
     }
 
     /**
-     * Добавляет clientHandler в списое при подключении
+     * Добавляет clientHandler в списое при подключении клиента
      * @param clientHandler
      */
     public void addClientHandlerToList (ClientHandler clientHandler) {
@@ -62,25 +62,63 @@ public class Server {
      * и возвращает true
      * вызываетсся из clientHandler
      */
-    public synchronized boolean checkLogin (ClientHandler clientHandler, String login) {
-        for (ClientHandler client: clientList) {
-            if (client.getLogin().equals(login)) {
-                return false;
-            }
+    public synchronized boolean logging (ClientHandler clientHandler, String login) {
+        if (checkLogin(login)) {
+            return false;
         }
         clientHandler.setLogin(login);
         System.out.println("Клиент " + clientHandler.getSocket().getRemoteSocketAddress() + " залогинился, логин: " + login);
         return true;
     }
-    public synchronized void sendBroadcastMsg(String msg) {
+
+    /**
+     * Проверяет есть ли такой логин в списке clientHandler-ов
+     * @param login
+     * @return true - логин есть, false - логина нет
+     */
+    public boolean checkLogin (String login) {
         for (ClientHandler client: clientList) {
-            if (!client.getLogin().equals("")) {
-                try {
-                    client.getOut().writeUTF(msg);
-                } catch (IOException e) {
-                    client.closeConnection(e);
-                }
+            if (client.getLogin().equals(login)) {
+                return true;
             }
         }
+        return false;
+    }
+
+    /**
+     * Рассылает сообщение слиентам в списке clientHandler-ов
+     * @param msg
+     */
+    public void sendBroadcastMsg(String msg) {
+        for (ClientHandler client: clientList) {
+            if (!client.getLogin().equals("")) {
+                client.writeOut(msg);
+            }
+        }
+    }
+
+    /**
+     * Отправляет сообщение одному клиенту
+     * @param login логин клиента
+     * @param msg отправляесое сообщение
+     */
+    public synchronized void sendMsgOneUser(String login, String msg) {
+        for (ClientHandler client: clientList) {
+            if (client.getLogin().equals(login)) {
+                client.writeOut(msg);
+            }
+        }
+    }
+
+    /**
+     * возвращает сроку со списком всех логинов
+     * @return
+     */
+    public String getLoginList() {
+        String loginList = "";
+        for (ClientHandler client: clientList) {
+            loginList = loginList + client.getLogin() + " ";
+        };
+        return loginList;
     }
 }

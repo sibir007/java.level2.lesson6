@@ -1,24 +1,26 @@
-<?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.control.TextArea?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.control.Button?>
-<VBox fx:controller="ru.geekbrains.java.level2.chat.server.chat.server.Controller"
-      xmlns:fx="http://javafx.com/fxml" alignment="center">
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox alignment="center" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/11.0.1" fx:controller="ru.geekbrains.java.level2.chat.server.chat.server.Controller">
     <HBox fx:id="loginBox">
-        <TextField fx:id="loginField" HBox.hgrow="ALWAYS" promptText="Введите login"/>
+        <TextField fx:id="loginField" promptText="Введите login" HBox.hgrow="ALWAYS" />
         <!--
         <Button onAction="#send" text="Отправить"/>-->
-        <Button onAction="#login" text="login"/>
+        <Button onAction="#logging" text="login" />
     </HBox>
-    <TextArea fx:id="msgArea" VBox.vgrow="ALWAYS" editable="false" />
-    <HBox fx:id="sendMsgBox" visible="false" managed="false">
-        <TextField fx:id="msgField" HBox.hgrow="ALWAYS" promptText="Введите сообщение"/>
-<!--
-<Button onAction="#send" text="Отправить"/>-->
-        <Button onAction="#send" text="Отправить"/>
-    </HBox>
+    <TextArea fx:id="msgArea" editable="false" VBox.vgrow="ALWAYS" />
+    <VBox fx:id="sendMsgBox" managed="false" visible="false">
+        <HBox>
+            <TextField fx:id="msgField" promptText="Введите сообщение" HBox.hgrow="ALWAYS" />
+            <!--
+            <Button onAction="#send" text="Отправить"/>-->
+            <Button onAction="#send" text="Отправить" />
+        </HBox>
+        <Label text="/info - информация о командах" />
+    </VBox>
+
 
 
 </VBox>

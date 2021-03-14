@@ -4,6 +4,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -19,9 +20,9 @@ public class InStreamHandler implements Runnable {
     private DataOutputStream out;
     private DataInputStream in;
     public HBox loginBox;
-    public HBox sendMsgBox;
+    public VBox sendMsgBox;
 
-    public InStreamHandler (TextArea msgArea, DataInputStream in, Socket socket, HBox loginBox, HBox sendMsgBox, TextField loginField, TextField msgField) {
+    public InStreamHandler (TextArea msgArea, DataInputStream in, Socket socket, HBox loginBox, VBox sendMsgBox, TextField loginField, TextField msgField) {
 
         this.msgArea = msgArea;
         this.in = in;
