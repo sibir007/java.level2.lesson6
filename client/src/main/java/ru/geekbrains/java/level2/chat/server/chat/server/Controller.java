@@ -3,10 +3,7 @@ package ru.geekbrains.java.level2.chat.server.chat.server;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
@@ -25,12 +22,14 @@ public class Controller implements Initializable {
     @FXML
     public VBox sendMsgBox;
     @FXML
+    public ListView clientsList;
+    @FXML
     private TextField msgField;
     @FXML
     private TextArea msgArea;
-    private Socket socket;
     @FXML
     private TextField loginField;
+    private Socket socket;
     private DataOutputStream out;
     private DataInputStream in;
 
@@ -60,6 +59,9 @@ public class Controller implements Initializable {
         }
     }
 
+    /**
+     * called from ClientApp when closing program window
+     */
     public void onStageClose() {
         try {
             socket.close();

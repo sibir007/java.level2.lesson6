@@ -6,11 +6,13 @@
 <VBox alignment="center" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/11.0.1" fx:controller="ru.geekbrains.java.level2.chat.server.chat.server.Controller">
     <HBox fx:id="loginBox">
         <TextField fx:id="loginField" promptText="Введите login" HBox.hgrow="ALWAYS" />
-        <!--
-        <Button onAction="#send" text="Отправить"/>-->
         <Button onAction="#logging" text="login" />
     </HBox>
-    <TextArea fx:id="msgArea" editable="false" VBox.vgrow="ALWAYS" />
+    <HBox>
+        <TextArea fx:id="msgArea" editable="false" VBox.vgrow="ALWAYS" />
+<!--        <ListView fx:id="clientsList" visible="false" managed="false" prefWidth="150" maxWidth="150" minWidth="150"/>-->
+    </HBox>
+
     <VBox fx:id="sendMsgBox" managed="false" visible="false">
         <HBox>
             <TextField fx:id="msgField" promptText="Введите сообщение" HBox.hgrow="ALWAYS" />
