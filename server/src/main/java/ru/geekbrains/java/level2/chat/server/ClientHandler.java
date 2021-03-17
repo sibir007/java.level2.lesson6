@@ -12,6 +12,8 @@ public class ClientHandler implements Runnable {
     private DataOutputStream out;
     private String login = "";
     private int countMsg = 0;
+    //service msg
+
 
     public ClientHandler(Server server, Socket socket) {
         this.socket = socket;
@@ -69,15 +71,15 @@ public class ClientHandler implements Runnable {
             String infoMsg = "/stat - колличество отправленных сообщений\n" +
                     "/who_am_i - ваш логин в чате\n" +
                     "/w_login message - отправка сообщение только пользователю login\n" +
-                    "/exit - разрыв соединения с сервером\n" +
-                    "/who_is - кто в чате";
+                    "/exit - разрыв соединения с сервером";
             writeOut("server -> \n" + infoMsg);
             return;
         }
-        if (msg.startsWith("/login_")) {
+        if (msg.startsWith("/login")) { // /login login password
             loggingMsgHandler(msg);
             return;
-        };
+        }
+        ;
         if (msg.startsWith("/stat")) {
             writeOut("server -> count your messages: " + countMsg);
             return;
@@ -87,28 +89,34 @@ public class ClientHandler implements Runnable {
             return;
         }
         if (msg.startsWith("/w_")) {
-            wMsgHandler(msg);
+//            wMsgHandler(msg);
             return;
         }
         if (msg.startsWith("/exit")) {
             writeOut("server -> вы отключились");
             try {
                 throw new IOException("Клиент прислал запрос на разрыв соединения");
-            }catch (IOException e) {
+            } catch (IOException e) {
                 closeConnection(e);
             }
             return;
         }
-        if (msg.startsWith("/who_is")) {
-            writeOut("server -> in chat: " + server.getLoginList());
-            return;
+        if (msg.startsWith("/reg")) {
+            String[] regData = msg.split(" ");
+            String name = regData[1].split("_")[1];
+            String login = regData[2].split("_")[1];
+            String password = regData[3].split("_")[1];
+            boolean trueFalse = server.registration(name, login, password);
+            if (trueFalse) {
+                writeOut("/reg true");
+            } else {
+                writeOut("/reg false");
+            }
         }
     }
 
     /**
      * Обработчик не служебных сообщений
-     *
-     * @param msg
      */
     private void normalMsgHandler(String msg) {
         countMsg++;
@@ -117,30 +125,31 @@ public class ClientHandler implements Runnable {
 
     /**
      * Обработка отправки логина на сервер
-     *
-     * @param msg
      */
     private void loggingMsgHandler(String msg) {
-        String login = msg.split("_")[1];
-        if (server.logging(this, login)) {
-            writeOut("/login_true_" + login);
+        String login = msg.split(" ")[1];
+        String password = msg.split(" ")[2];
+        if (server.logging(this, login, password)) {
+            writeOut("/login true " + login);
+            String loginList = server.getLoginList();
+            server.sendBroadcastMsg("/login_list " + loginList);
         } else {
-            writeOut("/login_false_" + login);
+            writeOut("/login false " + login);
         }
     }
 
     /**
      * Обработка личного сообщения типа "/w_user message"
      */
-    private void wMsgHandler(String msg) {
-        String loginTargetUser = msg.split(" ")[0].split("_")[1];
-        if (!server.checkLogin(loginTargetUser)) {
-            writeOut("server -> пользователь с логином " + loginTargetUser + " не зарегистрирован");
-            return;
-        }
-        String message = msg.substring(msg.indexOf(" ") + 1);
-        server.sendMsgOneUser(loginTargetUser,getLogin() + " -> " + message);
-    }
+//    private void wMsgHandler(String msg) {
+//        String loginTargetUser = msg.split(" ")[0].split("_")[1];
+//        if (!server.checkLogin(loginTargetUser)) {
+//            writeOut("server -> пользователь с логином " + loginTargetUser + " не зарегистрирован");
+//            return;
+//        }
+//        String message = msg.substring(msg.indexOf(" ") + 1);
+//        server.sendMsgOneUser(loginTargetUser,getLogin() + " -> " + message);
+//    }
 
     /**
      * Закрывает сокет
@@ -158,11 +167,15 @@ public class ClientHandler implements Runnable {
         }
         System.out.println("соединение с клиентом " + socket.getRemoteSocketAddress() + " разорвано, socket закрыт");
         server.removeClientHandlerFromList(this);
+        String loginList = server.getLoginList();
+        server.sendBroadcastMsg("/login_list " + loginList);
+
     }
 
     /**
      * Пишет сообщение в out
      * синхронизироват т.к. может быть вызван из нескольких параллельных потоков
+     *
      * @param msg
      */
     public synchronized void writeOut(String msg) {
