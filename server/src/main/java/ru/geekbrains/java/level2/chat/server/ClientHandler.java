@@ -12,6 +12,11 @@ public class ClientHandler implements Runnable {
     private DataOutputStream out;
     private String login = "";
     private int countMsg = 0;
+    private String infoMsg = "/who_am_i - ваш логин в чате\n" +
+            "/w_login message - отправка сообщение только пользователю login\n" +
+            "/exit - разрыв соединения с сервером";
+    //service msg
+
 
     public ClientHandler(Server server, Socket socket) {
         this.socket = socket;
@@ -65,21 +70,16 @@ public class ClientHandler implements Runnable {
             normalMsgHandler(msg);
             return;
         }
-        if (msg.startsWith("/info")) {
-            String infoMsg = "/stat - колличество отправленных сообщений\n" +
-                    "/who_am_i - ваш логин в чате\n" +
-                    "/w_login message - отправка сообщение только пользователю login\n" +
-                    "/exit - разрыв соединения с сервером\n" +
-                    "/who_is - кто в чате";
-            writeOut("server -> \n" + infoMsg);
+        if (msg.startsWith("/reg")) {
+            regMsgHandler(msg);
             return;
         }
         if (msg.startsWith("/login_")) {
             loggingMsgHandler(msg);
             return;
-        };
-        if (msg.startsWith("/stat")) {
-            writeOut("server -> count your messages: " + countMsg);
+        }
+        if (msg.startsWith("/info")) {
+            writeOut("server -> \n" + infoMsg);
             return;
         }
         if (msg.startsWith("/who_am_i")) {
@@ -99,16 +99,13 @@ public class ClientHandler implements Runnable {
             }
             return;
         }
-        if (msg.startsWith("/who_is")) {
-            writeOut("server -> in chat: " + server.getLoginList());
-            return;
+        if (msg.startsWith("/logout")) {
+            logoutHandler();
         }
     }
 
     /**
      * Обработчик не служебных сообщений
-     *
-     * @param msg
      */
     private void normalMsgHandler(String msg) {
         countMsg++;
@@ -116,9 +113,23 @@ public class ClientHandler implements Runnable {
     }
 
     /**
-     * Обработка отправки логина на сервер
-     *
-     * @param msg
+     * обработка регистрации "/reg name login password"
+     */
+    private void regMsgHandler(String msg){
+        String[] regData = msg.split(" ");
+        String name = regData[1].split("_")[1];
+        String login = regData[2].split("_")[1];
+        String password = regData[3].split("_")[1];
+        boolean trueFalse = server.registration(name, login, password);
+        if (trueFalse) {
+            writeOut("/reg true");
+        } else {
+            writeOut("/reg false");
+        }
+    }
+
+    /**
+     * Обработка отправки логина на сервер "/login login password"
      */
     private void loggingMsgHandler(String msg) {
         String login = msg.split("_")[1];
@@ -133,21 +144,40 @@ public class ClientHandler implements Runnable {
      * Обработка личного сообщения типа "/w_user message"
      */
     private void wMsgHandler(String msg) {
-        String loginTargetUser = msg.split(" ")[0].split("_")[1];
-        if (!server.checkLogin(loginTargetUser)) {
-            writeOut("server -> пользователь с логином " + loginTargetUser + " не зарегистрирован");
+        String targetUserLogin = msg.split(" ")[0].split("_")[1];
+        if (!server.checkLoginInChat(targetUserLogin)) {
+            writeOut("server -> пользователь с логином " + targetUserLogin + " не зарегистрирован");
             return;
         }
         String message = msg.substring(msg.indexOf(" ") + 1);
-        server.sendMsgOneUser(loginTargetUser,getLogin() + " -> " + message);
+        server.sendMsgOneUser(targetUserLogin,getLogin() + " -> " + message);
+    }
+
+    /**
+     *обработчик выхода пользователя из учётной записи "/logout"
+     */
+    private void logoutHandler() {
+        this.login = "";
+        String loginList = server.getLoginList();
+        server.sendBroadcastMsg("/login_list " + loginList);
+    }
+
+    /**
+     * Пишет сообщение в out
+     * синхронизироват т.к. может быть вызван из нескольких параллельных потоков
+     */
+    public synchronized void writeOut(String msg) {
+        try {
+            out.writeUTF(msg);
+        } catch (IOException e) {
+            closeConnection(e);
+        }
     }
 
     /**
      * Закрывает сокет
      * Удаляет clientHandler из списка рассылки
      * Печатает StackTrace
-     *
-     * @param e
      */
     public void closeConnection(IOException e) {
         e.printStackTrace();
@@ -160,16 +190,5 @@ public class ClientHandler implements Runnable {
         server.removeClientHandlerFromList(this);
     }
 
-    /**
-     * Пишет сообщение в out
-     * синхронизироват т.к. может быть вызван из нескольких параллельных потоков
-     * @param msg
-     */
-    public synchronized void writeOut(String msg) {
-        try {
-            out.writeUTF(msg);
-        } catch (IOException e) {
-            closeConnection(e);
-        }
-    }
+
 }

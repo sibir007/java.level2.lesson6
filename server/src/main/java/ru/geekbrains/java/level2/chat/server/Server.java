@@ -72,13 +72,21 @@ public class Server {
     }
 
     /**
-     * Проверяет есть ли такой логин в списке clientHandler-ов
-     * @param login
+     * Проверяет есть ли такой логин в users
      * @return true - логин есть, false - логина нет
      */
     public boolean checkLogin (String login) {
         for (ClientHandler client: clientList) {
             if (client.getLogin().equals(login)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean checkLoginInChat (String targetUserLogin) {
+        for (ClientHandler client: clientList) {
+            if (client.getLogin().equals(targetUserLogin)) {
                 return true;
             }
         }
@@ -115,10 +123,13 @@ public class Server {
      * @return
      */
     public String getLoginList() {
-        String loginList = "";
+        StringBuilder loginListSB = new StringBuilder();
         for (ClientHandler client: clientList) {
-            loginList = loginList + client.getLogin() + " ";
+            if (!client.getLogin().equals("")) {
+                loginListSB.append(client.getLogin() + " ");
+            }
         };
+        String loginList = new String(loginListSB);
         return loginList;
     }
 }

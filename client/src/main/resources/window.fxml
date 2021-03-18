@@ -4,24 +4,50 @@
 <?import javafx.scene.layout.*?>
 
 <VBox alignment="center" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/11.0.1" fx:controller="ru.geekbrains.java.level2.chat.server.chat.server.Controller">
-    <HBox fx:id="loginBox">
-        <TextField fx:id="loginField" promptText="Введите login" HBox.hgrow="ALWAYS" />
-        <Button onAction="#logging" text="login" />
-    </HBox>
-    <HBox>
-        <TextArea fx:id="msgArea" editable="false" VBox.vgrow="ALWAYS" />
-<!--        <ListView fx:id="clientsList" visible="false" managed="false" prefWidth="150" maxWidth="150" minWidth="150"/>-->
-    </HBox>
-
-    <VBox fx:id="sendMsgBox" managed="false" visible="false">
-        <HBox>
-            <TextField fx:id="msgField" promptText="Введите сообщение" HBox.hgrow="ALWAYS" />
-            <!--
-            <Button onAction="#send" text="Отправить"/>-->
-            <Button onAction="#send" text="Отправить" />
+    <VBox fx:id="loggingBox">
+        <HBox fx:id="loginBox">
+            <TextField fx:id="loginField" promptText="Введите login" HBox.hgrow="ALWAYS" />
+            <TextField fx:id="passwordField" promptText="Введите password" HBox.hgrow="ALWAYS" />
         </HBox>
-        <Label text="/info - информация о командах" />
+        <Button onAction="#logging" text="login" maxWidth="Infinity"/>
+        <Button onAction="#reg" text="registration" maxWidth="Infinity"/>
+        <Label fx:id="logLabel" maxWidth="Infinity"/>
     </VBox>
+    <VBox fx:id="regBox">
+        <HBox>
+            <Label text="Имя" />
+            <TextField fx:id="regFirstNameField" promptText="Введите имя" HBox.hgrow="ALWAYS"/>
+        </HBox>
+        <HBox>
+            <Label text="Логин" />
+            <TextField fx:id="regLoginField" promptText="Введите login" HBox.hgrow="ALWAYS"/>
+        </HBox>
+        <HBox>
+            <Label text="Пароль" />
+            <TextField fx:id="regPasswordField" promptText="Введите password" HBox.hgrow="ALWAYS"/>
+        </HBox>
+        <Button onAction="#registration" text="registration" maxWidth="Infinity"/>
+        <Button onAction="#exitReg" text="exit" maxWidth="Infinity"/>
+        <Label fx:id="regLabel" maxWidth="Infinity"/>
+    </VBox>
+    <VBox fx:id="chatBox" visible="false" managed="false" VBox.vgrow="ALWAYS">
+        <HBox VBox.vgrow="ALWAYS">
+            <TextArea fx:id="msgArea" editable="false"  wrapText="true"/>
+            <ListView fx:id="clientsList" />
+        </HBox>
+
+        <VBox fx:id="sendMsgBox">
+            <HBox>
+                <TextField fx:id="msgField" promptText="Введите сообщение" HBox.hgrow="ALWAYS" />
+                <!--
+                <Button onAction="#send" text="Отправить"/>-->
+                <Button onAction="#send" text="Отправить" />
+            </HBox>
+            <Button onAction="#logout" text="logout" maxWidth="Infinity"/>
+            <Label text="/info - информация о командах" />
+        </VBox>
+    </VBox>
+
 
 
 
