@@ -12,10 +12,14 @@ public class Server {
     private static ServerSocket serverSocket;
     private static Socket socket;
     private static String msg;
-    private LinkedList<ClientHandler> clientList = new LinkedList<>();
+    private LinkedList<ClientHandler> clientList;
+    private LinkedList<User> users;
 
 
     public Server(int port) {
+        this.clientList = new LinkedList<>();
+        this.users = new LinkedList<>();
+
         try {
             serverSocket = new ServerSocket(port);
             System.out.println("Сервер запущен на порту 8189. Ожидаем подключения клиентов ...");
@@ -38,13 +42,6 @@ public class Server {
 
     }
 
-    /**
-     * Добавляет clientHandler в списое при подключении клиента
-     * @param clientHandler
-     */
-    public void addClientHandlerToList (ClientHandler clientHandler) {
-        clientList.add(clientHandler);
-    }
 
     /**
      * Удаляет clientHandler из списка при разрыве соединения с клиентом
@@ -53,31 +50,29 @@ public class Server {
      */
     public void removeClientHandlerFromList (ClientHandler clientHandler) {
         clientList.remove(clientHandler);
+
         System.out.println("clientHandler клиента " + clientHandler.getSocket().getRemoteSocketAddress() + " удалён из списка расслылки");
     }
 
     /**
-     * Проверяет есть ли уже такой логин, если есть
-     * возвращает false, если нет присваивает clientHandler логин
-     * и возвращает true
-     * вызываетсся из clientHandler
+     * Проверяет, есть ли
      */
-    public synchronized boolean logging (ClientHandler clientHandler, String login) {
-        if (checkLogin(login)) {
-            return false;
+    public synchronized boolean logging (ClientHandler clientHandler, String login, String password) {
+        if (checkLogin(login, password)) {
+            clientHandler.setLogin(login);
+            System.out.println("Клиент " + clientHandler.getSocket().getRemoteSocketAddress() + " залогинился, логин: " + login);
+            return true;
         }
-        clientHandler.setLogin(login);
-        System.out.println("Клиент " + clientHandler.getSocket().getRemoteSocketAddress() + " залогинился, логин: " + login);
-        return true;
+        return false;
     }
 
     /**
      * Проверяет есть ли такой логин в users
      * @return true - логин есть, false - логина нет
      */
-    public boolean checkLogin (String login) {
-        for (ClientHandler client: clientList) {
-            if (client.getLogin().equals(login)) {
+    public boolean checkLogin (String login, String password) {
+        for (User user: users) {
+            if (user.getLogin().equals(login) && user.getPassword().equals(password)) {
                 return true;
             }
         }
@@ -131,5 +126,18 @@ public class Server {
         };
         String loginList = new String(loginListSB);
         return loginList;
+    }
+
+    /**
+     * регистрация user
+     */
+    public boolean registration (String name, String login, String password) {
+        for (User user: users) {
+            if (user.getLogin().equals(login)) {
+                return false;
+            }
+        }
+        users.add(new User(name, login, password));
+        return true;
     }
 }
