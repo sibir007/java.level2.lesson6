@@ -17,27 +17,50 @@ import java.nio.charset.StandardCharsets;
 import java.util.ResourceBundle;
 
 public class Controller implements Initializable {
-    @FXML
+    //loginBox
+    public VBox loggingBox;
     public HBox loginBox;
-    @FXML
+    public TextField passwordField;
+    public TextField loginField;
+    public Label logLabel;
+
+
+    // regBox
+    public VBox regBox;
+    public TextField regFirstNameField;
+    public TextField regLoginField;
+    public TextField regPasswordField;
+    public Label regLabel;
+
+    // chatBox
+    public VBox chatBox;
     public VBox sendMsgBox;
-    @FXML
     public ListView clientsList;
-    @FXML
-    private TextField msgField;
-    @FXML
-    private TextArea msgArea;
-    @FXML
-    private TextField loginField;
-    private Socket socket;
-    private DataOutputStream out;
-    private DataInputStream in;
+    public TextField msgField;
+    public TextArea msgArea;
 
 
-    public void send(ActionEvent actionEvent) {
+    public Socket socket;
+    public DataOutputStream out;
+    public DataInputStream in;
+
+
+    @Override
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+        loggingBox.setVisible(true);
+        loggingBox.setManaged(true);
+        regBox.setVisible(false);
+        regBox.setManaged(false);
+        chatBox.setVisible(false);
+        chatBox.setManaged(false);
+        connect();
+    }
+
+    private void connect() {
         try {
-            out.writeUTF(msgField.getText());
-            msgField.clear();
+            socket = new Socket("localhost", 8189);
+            in = new DataInputStream(socket.getInputStream());
+            out = new DataOutputStream(socket.getOutputStream());
         } catch (IOException e) {
             throw new RuntimeException("Unable to connect to server localhost:8189");
         }
@@ -140,6 +163,7 @@ public class Controller implements Initializable {
             alert.showAndWait();
         }
     }
+
 
     /**
      * called from ClientApp when closing program window

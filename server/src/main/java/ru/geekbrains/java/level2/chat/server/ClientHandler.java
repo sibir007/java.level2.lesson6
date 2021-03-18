@@ -74,7 +74,7 @@ public class ClientHandler implements Runnable {
             regMsgHandler(msg);
             return;
         }
-        if (msg.startsWith("/login_")) {
+        if (msg.startsWith("/login")) { // /login login password
             loggingMsgHandler(msg);
             return;
         }
@@ -94,7 +94,7 @@ public class ClientHandler implements Runnable {
             writeOut("server -> вы отключились");
             try {
                 throw new IOException("Клиент прислал запрос на разрыв соединения");
-            }catch (IOException e) {
+            } catch (IOException e) {
                 closeConnection(e);
             }
             return;
@@ -132,11 +132,14 @@ public class ClientHandler implements Runnable {
      * Обработка отправки логина на сервер "/login login password"
      */
     private void loggingMsgHandler(String msg) {
-        String login = msg.split("_")[1];
-        if (server.logging(this, login)) {
-            writeOut("/login_true_" + login);
+        String login = msg.split(" ")[1];
+        String password = msg.split(" ")[2];
+        if (server.logging(this, login, password)) {
+            writeOut("/login true " + login);
+            String loginList = server.getLoginList();
+            server.sendBroadcastMsg("/login_list " + loginList);
         } else {
-            writeOut("/login_false_" + login);
+            writeOut("/login false " + login);
         }
     }
 
@@ -188,6 +191,9 @@ public class ClientHandler implements Runnable {
         }
         System.out.println("соединение с клиентом " + socket.getRemoteSocketAddress() + " разорвано, socket закрыт");
         server.removeClientHandlerFromList(this);
+        String loginList = server.getLoginList();
+        server.sendBroadcastMsg("/login_list " + loginList);
+
     }
 
 
