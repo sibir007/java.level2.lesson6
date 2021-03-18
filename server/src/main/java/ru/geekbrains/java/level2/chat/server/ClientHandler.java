@@ -49,33 +49,73 @@ public class ClientHandler implements Runnable {
 
     @Override
     public void run() {
-        String msg;
         try {
+            //цикл регистрации и авторизации
             while (true) {
-                msg = in.readUTF();
-                msgHandler(msg);
+                String regLogMsg = in.readUTF();
+                if (regLogMsg.startsWith("/reg")){
+                    regMsgHandler(regLogMsg);
+                    continue;
+                }
+                if (regLogMsg.startsWith("/login")) {
+                    if (loggingMsgHandler(regLogMsg)) {
+                        break;
+                    }
+                };
             }
+            //цикл общения
+            while (true) {
+                String msg = in.readUTF();
+                msgDispatcher(msg);
+            }
+
         } catch (IOException e) {
             closeConnection(e);
         }
     }
 
+
     /**
-     * Диспетчер обработки сообщений
-     *
-     * @param msg
+     * обработка регистрации "/reg name login password"
      */
-    private void msgHandler(String msg) {
+    private boolean regMsgHandler(String msg){
+        String[] regData = msg.split(" ");
+        String name = regData[1].split("_")[1];
+        String login = regData[2].split("_")[1];
+        String password = regData[3].split("_")[1];
+        boolean trueFalse = server.registration(name, login, password);
+        if (trueFalse) {
+            writeOut("/reg true");
+            return true;
+        } else {
+            writeOut("/reg false");
+            return false;
+        }
+    }
+
+    /**
+     * Обработка авторизации "/login login password"
+     */
+    private boolean loggingMsgHandler(String msg) {
+        String login = msg.split(" ")[1];
+        String password = msg.split(" ")[2];
+        if (server.logging(this, login, password)) {
+            writeOut("/login true " + login);
+            String loginList = server.getLoginList();
+            server.sendBroadcastMsg("/login_list " + loginList);
+            return true;
+        } else {
+            writeOut("/login false " + login);
+            return false;
+        }
+    }
+
+    /**
+     * Диспетчер обработки сообщений в цикле общения
+     */
+    private void msgDispatcher(String msg) {
         if (!msg.startsWith("/")) {
             normalMsgHandler(msg);
-            return;
-        }
-        if (msg.startsWith("/reg")) {
-            regMsgHandler(msg);
-            return;
-        }
-        if (msg.startsWith("/login")) { // /login login password
-            loggingMsgHandler(msg);
             return;
         }
         if (msg.startsWith("/info")) {
@@ -110,37 +150,6 @@ public class ClientHandler implements Runnable {
     private void normalMsgHandler(String msg) {
         countMsg++;
         server.sendBroadcastMsg(getLogin() + " -> " + msg);
-    }
-
-    /**
-     * обработка регистрации "/reg name login password"
-     */
-    private void regMsgHandler(String msg){
-        String[] regData = msg.split(" ");
-        String name = regData[1].split("_")[1];
-        String login = regData[2].split("_")[1];
-        String password = regData[3].split("_")[1];
-        boolean trueFalse = server.registration(name, login, password);
-        if (trueFalse) {
-            writeOut("/reg true");
-        } else {
-            writeOut("/reg false");
-        }
-    }
-
-    /**
-     * Обработка отправки логина на сервер "/login login password"
-     */
-    private void loggingMsgHandler(String msg) {
-        String login = msg.split(" ")[1];
-        String password = msg.split(" ")[2];
-        if (server.logging(this, login, password)) {
-            writeOut("/login true " + login);
-            String loginList = server.getLoginList();
-            server.sendBroadcastMsg("/login_list " + loginList);
-        } else {
-            writeOut("/login false " + login);
-        }
     }
 
     /**

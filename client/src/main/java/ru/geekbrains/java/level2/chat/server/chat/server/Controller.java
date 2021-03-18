@@ -38,11 +38,13 @@ public class Controller implements Initializable {
     public ListView clientsList;
     public TextField msgField;
     public TextArea msgArea;
+    public Label loginLabel;
 
 
     public Socket socket;
     public DataOutputStream out;
     public DataInputStream in;
+
 
 
     @Override

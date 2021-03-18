@@ -99,6 +99,7 @@ public class InStreamHandler implements Runnable {
                 controller.loginField.clear();
                 controller.passwordField.clear();
                 controller.logLabel.setText("");
+                controller.loginLabel.setText(login);
             });
             this.login = login;
         } else {
