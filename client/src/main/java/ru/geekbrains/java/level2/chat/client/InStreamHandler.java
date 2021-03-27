@@ -1,17 +1,8 @@
-package ru.geekbrains.java.level2.chat.server.chat.server;
+package ru.geekbrains.java.level2.chat.client;
 
 import javafx.application.Platform;
-import javafx.fxml.FXML;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
-import java.net.Socket;
 
 public class InStreamHandler implements Runnable {
     private Controller controller;
@@ -98,13 +89,13 @@ public class InStreamHandler implements Runnable {
                 controller.regLabel.setText("");
                 controller.loginField.clear();
                 controller.passwordField.clear();
-                controller.logLabel.setText("");
+                controller.logMsg.setText("");
                 controller.loginLabel.setText(login);
             });
             this.login = login;
         } else {
             Platform.runLater(() ->{
-                controller.logLabel.setText("Неверные login или password");
+                controller.logMsg.setText("Неверные login или password");
             });
         }
     }

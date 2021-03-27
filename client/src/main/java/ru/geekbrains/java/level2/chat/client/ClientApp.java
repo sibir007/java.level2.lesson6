@@ -1,12 +1,10 @@
-package ru.geekbrains.java.level2.chat.server.chat.server;
+package ru.geekbrains.java.level2.chat.client;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-
-import java.io.FileWriter;
 
 public class ClientApp extends Application {
 

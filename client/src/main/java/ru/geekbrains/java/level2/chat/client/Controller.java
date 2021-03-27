@@ -1,7 +1,6 @@
-package ru.geekbrains.java.level2.chat.server.chat.server;
+package ru.geekbrains.java.level2.chat.client;
 
 import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
@@ -13,16 +12,17 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.util.ResourceBundle;
 
 public class Controller implements Initializable {
+    private final String HOST = "localhost";
+    private final int PORT = 8189;
     //loginBox
     public VBox loggingBox;
     public HBox loginBox;
     public TextField passwordField;
     public TextField loginField;
-    public Label logLabel;
+    public Label logMsg;
 
 
     // regBox
@@ -55,22 +55,24 @@ public class Controller implements Initializable {
         regBox.setManaged(false);
         chatBox.setVisible(false);
         chatBox.setManaged(false);
-        connect();
+//        connect();
     }
 
     private void connect() {
         try {
-            socket = new Socket("localhost", 8189);
+            socket = new Socket(HOST, PORT);
             in = new DataInputStream(socket.getInputStream());
             out = new DataOutputStream(socket.getOutputStream());
         } catch (IOException e) {
-            throw new RuntimeException("Unable to connect to server localhost:8189");
+            showAlert(String.format("Не возможно установить соединение с сервером %s:%d", HOST,PORT));
+//            throw new RuntimeException("Unable to connect to server localhost:8189");
         }
         new Thread(new InStreamHandler(this)).start();
     }
 
     // loginBox
     /**
+     * Обработчик кнопки registration на loginBox
      * отктывает панель регистрации
      */
     public void reg(ActionEvent actionEvent) {
@@ -83,14 +85,21 @@ public class Controller implements Initializable {
     }
 
     /**
-     * если поля не пустые - отправляет логин и пароль на сервер
+     * Обработчик кнопки login на loginBox
+     * если поля логин и пароль не заполнены делает сообщение и выходит
+     * если соединение не установлено - устанавливает
+     * отправляет логин и пароль на сервер
      */
     public void logging(ActionEvent actionEvent) {
+
         if (loginField.getText().isEmpty() || passwordField.getText().isEmpty()) {
-            logLabel.setText("Поля логин и пароль не должены быть пустыми");
+            logMsg.setText("Поля логин и пароль не должены быть пустыми");
             return;
         }
         String msg = "/login " + loginField.getText() + " " + passwordField.getText();
+        if (socket == null) {
+            connect();
+        }
         sendMsg(msg);
         loginField.clear();
         passwordField.clear();
@@ -98,6 +107,8 @@ public class Controller implements Initializable {
 
     //regBox
     /**
+     * Обработчик кнопки registration на regBox
+     * если соединение не установлено - устанавливает
      * отправляет регистрационные данные на сервер
      */
     public void registration(ActionEvent actionEvent) {
@@ -111,6 +122,9 @@ public class Controller implements Initializable {
                 " name_" + regFirstNameField.getText() +
                 " login_" + regLoginField.getText() +
                 " pass_" + regPasswordField.getText();
+        if (socket == null) {
+            connect();
+        }
         sendMsg(msg);
     }
 
@@ -133,6 +147,7 @@ public class Controller implements Initializable {
     //chatBox
 
     /**
+     * Обработчик кнопки send в chatBox-е
      * отправка сообщения на сервер
      */
     public void send(ActionEvent actionEvent) {
@@ -161,8 +176,7 @@ public class Controller implements Initializable {
             out.writeUTF(msg);
 
         } catch (IOException e) {
-            Alert alert = new Alert(Alert.AlertType.ERROR, "невозможно отправить сообщение", ButtonType.OK);
-            alert.showAndWait();
+            showAlert("невозможно отправить сообщение");
         }
     }
 
@@ -176,6 +190,17 @@ public class Controller implements Initializable {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Alert
+     */
+    private void showAlert(String msg) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setContentText(msg);
+        alert.setTitle("Chat");
+        alert.setHeaderText(null);
+        alert.showAndWait();
     }
 
 

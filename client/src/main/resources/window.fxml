@@ -3,15 +3,20 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox alignment="center" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/11.0.1" fx:controller="ru.geekbrains.java.level2.chat.server.chat.server.Controller">
+<VBox alignment="center" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/11.0.1" fx:controller="ru.geekbrains.java.level2.chat.client.Controller">
     <VBox fx:id="loggingBox">
+
+        <Label maxWidth="Infinity" text="Введите логин и пароль"/>
         <HBox fx:id="loginBox">
             <TextField fx:id="loginField" promptText="Введите login" HBox.hgrow="ALWAYS" />
             <TextField fx:id="passwordField" promptText="Введите password" HBox.hgrow="ALWAYS" />
         </HBox>
         <Button onAction="#logging" text="login" maxWidth="Infinity"/>
+        <Label fx:id="logMsg" maxWidth="Infinity"/>
+
+        <Label maxWidth="Infinity" text="Если вы ещё не зарегистрироланы - пройдите регистрацию"/>
         <Button onAction="#reg" text="registration" maxWidth="Infinity"/>
-        <Label fx:id="logLabel" maxWidth="Infinity"/>
+
     </VBox>
     <VBox fx:id="regBox">
         <HBox>

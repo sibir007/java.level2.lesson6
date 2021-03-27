@@ -59,15 +59,19 @@ public class ClientHandler implements Runnable {
                 }
                 if (regLogMsg.startsWith("/login")) {
                     if (loggingMsgHandler(regLogMsg)) {
-                        break;
+                        //цикл общения
+                        while (true) {
+                            String msg = in.readUTF();
+                            if (msg.startsWith("/logout")) {
+                                logoutHandler();
+                                break;
+                            }
+                            msgDispatcher(msg);
+                        }
                     }
                 };
             }
-            //цикл общения
-            while (true) {
-                String msg = in.readUTF();
-                msgDispatcher(msg);
-            }
+
 
         } catch (IOException e) {
             closeConnection(e);
@@ -139,9 +143,7 @@ public class ClientHandler implements Runnable {
             }
             return;
         }
-        if (msg.startsWith("/logout")) {
-            logoutHandler();
-        }
+
     }
 
     /**
