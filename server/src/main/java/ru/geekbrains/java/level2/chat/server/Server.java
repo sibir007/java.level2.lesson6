@@ -131,13 +131,17 @@ public class Server {
     /**
      * регистрация user
      */
-    public boolean registration (String name, String login, String password) {
+    public synchronized boolean registration (ClientHandler clientHandler, String name, String login, String password) {
+        System.out.println("Клиент " + clientHandler.getSocket().getRemoteSocketAddress() +
+                " регистрируется - имя: " + name + ", логин: " + login + ", пароль: " + password);
         for (User user: users) {
             if (user.getLogin().equals(login)) {
+                System.out.println("Пользователь с таким логином уже зарегистрирован. Регистрация - false");
                 return false;
             }
         }
         users.add(new User(name, login, password));
+        System.out.println("Пользователь зарегистрирован. Регистрация - true");
         return true;
     }
 }

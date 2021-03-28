@@ -55,7 +55,7 @@ public class Controller implements Initializable {
         regBox.setManaged(false);
         chatBox.setVisible(false);
         chatBox.setManaged(false);
-//        connect();
+        connect();
     }
 
     private void connect() {
@@ -87,7 +87,6 @@ public class Controller implements Initializable {
     /**
      * Обработчик кнопки login на loginBox
      * если поля логин и пароль не заполнены делает сообщение и выходит
-     * если соединение не установлено - устанавливает
      * отправляет логин и пароль на сервер
      */
     public void logging(ActionEvent actionEvent) {
@@ -97,9 +96,6 @@ public class Controller implements Initializable {
             return;
         }
         String msg = "/login " + loginField.getText() + " " + passwordField.getText();
-        if (socket == null) {
-            connect();
-        }
         sendMsg(msg);
         loginField.clear();
         passwordField.clear();
@@ -108,7 +104,6 @@ public class Controller implements Initializable {
     //regBox
     /**
      * Обработчик кнопки registration на regBox
-     * если соединение не установлено - устанавливает
      * отправляет регистрационные данные на сервер
      */
     public void registration(ActionEvent actionEvent) {
@@ -122,9 +117,6 @@ public class Controller implements Initializable {
                 " name_" + regFirstNameField.getText() +
                 " login_" + regLoginField.getText() +
                 " pass_" + regPasswordField.getText();
-        if (socket == null) {
-            connect();
-        }
         sendMsg(msg);
     }
 

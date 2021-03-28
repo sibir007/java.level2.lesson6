@@ -34,8 +34,7 @@ public class ClientHandler implements Runnable {
         }
     }
 
-
-    public String getLogin() {
+   public String getLogin() {
         return login;
     }
 
@@ -80,14 +79,14 @@ public class ClientHandler implements Runnable {
 
 
     /**
-     * обработка регистрации "/reg name login password"
+     * обработка регистрации "/reg name_Дима login_dima password_1111"
      */
     private boolean regMsgHandler(String msg){
         String[] regData = msg.split(" ");
         String name = regData[1].split("_")[1];
         String login = regData[2].split("_")[1];
         String password = regData[3].split("_")[1];
-        boolean trueFalse = server.registration(name, login, password);
+        boolean trueFalse = server.registration(this, name, login, password);
         if (trueFalse) {
             writeOut("/reg true");
             return true;
