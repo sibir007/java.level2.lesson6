@@ -120,6 +120,7 @@ public class InStreamHandler implements Runnable {
                 controller.regFirstNameField.clear();
                 controller.regLoginField.clear();
                 controller.regPasswordField.clear();
+                controller.logMsg.setText("");
             } else {
                 controller.regLabel.setText("Пользователь с таким логином уже зарегистрирован");
             }

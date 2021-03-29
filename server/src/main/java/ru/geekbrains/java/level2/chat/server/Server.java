@@ -5,6 +5,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -13,12 +14,14 @@ public class Server {
     private static Socket socket;
     private static String msg;
     private LinkedList<ClientHandler> clientList;
+    private JdbcRegistrationProvider jdbcRegistrationProvider;
     private LinkedList<User> users;
 
 
     public Server(int port) {
         this.clientList = new LinkedList<>();
         this.users = new LinkedList<>();
+        this.jdbcRegistrationProvider = new JdbcRegistrationProvider();
 
         try {
             serverSocket = new ServerSocket(port);
@@ -38,6 +41,7 @@ public class Server {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            jdbcRegistrationProvider.disconnect();
         }
 
     }
@@ -58,7 +62,7 @@ public class Server {
      * Проверяет, есть ли
      */
     public synchronized boolean logging (ClientHandler clientHandler, String login, String password) {
-        if (checkLogin(login, password)) {
+        if (jdbcRegistrationProvider.checkLoginAndPassword(login, password)) {
             clientHandler.setLogin(login);
             System.out.println("Клиент " + clientHandler.getSocket().getRemoteSocketAddress() + " залогинился, логин: " + login);
             return true;
@@ -66,18 +70,7 @@ public class Server {
         return false;
     }
 
-    /**
-     * Проверяет есть ли такой логин в users
-     * @return true - логин есть, false - логина нет
-     */
-    public boolean checkLogin (String login, String password) {
-        for (User user: users) {
-            if (user.getLogin().equals(login) && user.getPassword().equals(password)) {
-                return true;
-            }
-        }
-        return false;
-    }
+
 
     public boolean checkLoginInChat (String targetUserLogin) {
         for (ClientHandler client: clientList) {
@@ -131,17 +124,20 @@ public class Server {
     /**
      * регистрация user
      */
-    public synchronized boolean registration (ClientHandler clientHandler, String name, String login, String password) {
-        System.out.println("Клиент " + clientHandler.getSocket().getRemoteSocketAddress() +
-                " регистрируется - имя: " + name + ", логин: " + login + ", пароль: " + password);
-        for (User user: users) {
-            if (user.getLogin().equals(login)) {
-                System.out.println("Пользователь с таким логином уже зарегистрирован. Регистрация - false");
-                return false;
-            }
-        }
-        users.add(new User(name, login, password));
-        System.out.println("Пользователь зарегистрирован. Регистрация - true");
-        return true;
+//    public synchronized boolean registration (ClientHandler clientHandler, String name, String login, String password) {
+//        System.out.println("Клиент " + clientHandler.getSocket().getRemoteSocketAddress() +
+//                " регистрируется - имя: " + name + ", логин: " + login + ", пароль: " + password);
+//        for (User user: users) {
+//            if (user.getLogin().equals(login)) {
+//                System.out.println("Пользователь с таким логином уже зарегистрирован. Регистрация - false");
+//                return false;
+//            }
+//        }
+//        users.add(new User(name, login, password));
+//        System.out.println("Пользователь зарегистрирован. Регистрация - true");
+//        return true;
+//    }
+    public synchronized boolean registration (ClientHandler clientHandler, String name, String login, String password){
+        return jdbcRegistrationProvider.userRegistration(name, login, password);
     }
 }
