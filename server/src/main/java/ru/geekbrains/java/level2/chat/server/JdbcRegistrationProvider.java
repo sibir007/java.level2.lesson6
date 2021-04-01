@@ -64,13 +64,10 @@ public class JdbcRegistrationProvider {
         return true;
     }
     private boolean checkUser(String login){
-        try (ResultSet rs = stmt.executeQuery("select login from users;")) {
-            while (rs.next()) {
-                if (rs.getString("login").equals(login)){
-                    return true;
-                }
+        try (ResultSet rs = stmt.executeQuery("select login from users where login = '" +login + "';")) {
+            if (rs.next()){
+                return true;
             }
-
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }

@@ -7,9 +7,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.Socket;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -44,6 +42,7 @@ public class Controller implements Initializable {
     public Socket socket;
     public DataOutputStream out;
     public DataInputStream in;
+    public String login;
 
 
 
@@ -121,7 +120,7 @@ public class Controller implements Initializable {
     }
 
     /**
-     * отмена регистрации
+     * Обработчик кнопки exit на regBox - отмена регистрации
      */
     public void exitReg(ActionEvent actionEvent) {
         loggingBox.setVisible(true);
@@ -147,6 +146,9 @@ public class Controller implements Initializable {
         msgField.clear();
     }
 
+    /**
+     * Обработчик кнопки logout в chatBox-е     *
+     */
     public void logout(ActionEvent actionEvent) {
         sendMsg("/logout");
         loggingBox.setVisible(true);
@@ -156,7 +158,9 @@ public class Controller implements Initializable {
         chatBox.setVisible(false);
         chatBox.setManaged(false);
         msgField.clear();
+        msgArea.clear();
     }
+
 
 
     /**
@@ -166,7 +170,6 @@ public class Controller implements Initializable {
     private void sendMsg(String msg) {
         try {
             out.writeUTF(msg);
-
         } catch (IOException e) {
             showAlert("невозможно отправить сообщение");
         }

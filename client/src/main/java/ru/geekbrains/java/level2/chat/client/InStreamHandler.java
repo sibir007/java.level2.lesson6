@@ -2,11 +2,11 @@ package ru.geekbrains.java.level2.chat.client;
 
 import javafx.application.Platform;
 
-import java.io.IOException;
+import java.io.*;
 
 public class InStreamHandler implements Runnable {
     private Controller controller;
-    String login;
+
 
     public InStreamHandler (Controller controller) {
         this.controller = controller;
@@ -18,13 +18,11 @@ public class InStreamHandler implements Runnable {
         try {
             while (true) {
                 String msg = controller.in.readUTF();
-                System.out.println(msg);
                 if (msg.startsWith("/")) {
                     serviceMsgHandler(msg);
                 } else {
                     normalMsgHandler(msg);
                 }
-
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -41,10 +39,7 @@ public class InStreamHandler implements Runnable {
      * @param msg
      */
     private void serviceMsgHandler(String msg) {
-        System.out.println("serviceMsgHandler " + msg);
-//        System.out.println("mes2" + msg);
         String prefixMsg = msg.split(" ")[0];
-        System.out.println("prefixMsg " + prefixMsg);
         switch (prefixMsg) {
             case "/login":
                 loginMsgHandler(msg);
@@ -65,12 +60,15 @@ public class InStreamHandler implements Runnable {
      * @param msg
      */
     private void normalMsgHandler (String msg) {
-        controller.msgArea.appendText(msg + "\n");
+        writeHistoryFile(msg); // записываем сообщение в historyFile
+        Platform.runLater(() -> {
+            controller.msgArea.appendText(msg + "\n");
+        });
+
     }
 
     /**
      * processing logging messages
-     *
      */
     private void loginMsgHandler(String msg) {
         String trueFalse = msg.split(" ")[1];
@@ -91,8 +89,10 @@ public class InStreamHandler implements Runnable {
                 controller.passwordField.clear();
                 controller.logMsg.setText("");
                 controller.loginLabel.setText(login);
+                controller.login = login;
             });
-            this.login = login;
+
+            loadHistoryFile(login); //загружаем файл истории в msgArea
         } else {
             Platform.runLater(() ->{
                 controller.logMsg.setText("Неверные login или password");
@@ -101,14 +101,43 @@ public class InStreamHandler implements Runnable {
     }
 
     /**
+     * Загружает файл истории в msgArea
+     * @param login
+     */
+    private void loadHistoryFile(String login) {
+        File historyFile = new File("history_" + login + ".txt");
+        if(historyFile.exists()) {
+            try (BufferedReader reader = new BufferedReader(new FileReader(historyFile))) {
+                String str;
+                while ((str = reader.readLine()) != null) {
+                    String finalStr = str;
+                    Platform.runLater(() -> {
+                        controller.msgArea.appendText(finalStr + "\n");
+                    });
+                }
+               }catch (IOException e)  {
+                   e.printStackTrace();
+               }
+        }
+    }
+
+    /**
+     * записывает сообщение в historyFile
+     */
+    public void writeHistoryFile(String msg) {
+        System.out.println("in writeHistoryFile");
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("history_" + controller.login + ".txt", true))){
+            writer.write(msg + "\n");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
      * Обработчик сообщений о регистрации
      */
     private void regMsgHandler(String msg) {
-        System.out.println("regMsgHandler");
-        System.out.println(msg);
-        System.out.println(Thread.currentThread().getName());
         Platform.runLater(() -> {
-            System.out.println(Thread.currentThread().getName());
             String trueFalse = msg.split(" ")[1];
             if (trueFalse.equals("true")) {
                 controller.loggingBox.setVisible(true);
@@ -128,7 +157,6 @@ public class InStreamHandler implements Runnable {
 
     }
     private void loginListMsgHandler(String msg){
-        System.out.println("loginListMsgHandler");
         String[] tokens = msg.split(" ");
         Platform.runLater(() -> {
 //            System.out.println(Thread.currentThread().getName());
