@@ -10,7 +10,7 @@ public class JdbcRegistrationProvider {
     public JdbcRegistrationProvider() {
         try {
             Class.forName("org.sqlite.JDBC");
-            connection = DriverManager.getConnection("jdbc:sqlite:mdb0.db");
+            connection = DriverManager.getConnection("jdbc:sqlite:mdb01.db");
             stmt = connection.createStatement();
 //            stmt.executeUpdate("drop table if exists users;");
             stmt.executeUpdate("CREATE TABLE if not exists users (\n" +

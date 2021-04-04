@@ -8,6 +8,8 @@ import java.net.Socket;
 import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class Server {
     private static ServerSocket serverSocket;
@@ -16,12 +18,17 @@ public class Server {
     private LinkedList<ClientHandler> clientList;
     private JdbcRegistrationProvider jdbcRegistrationProvider;
     private LinkedList<User> users;
+    private ExecutorService executorService;
 
 
     public Server(int port) {
         this.clientList = new LinkedList<>();
         this.users = new LinkedList<>();
         this.jdbcRegistrationProvider = new JdbcRegistrationProvider();
+
+        //20 случайное число, должно выбираться исходя из доступных ресурсов системы,
+        //в данном случае это ограничение одновременных пользователей чата до 20.
+        this.executorService = Executors.newFixedThreadPool(20);
 
         try {
             serverSocket = new ServerSocket(port);
@@ -31,7 +38,7 @@ public class Server {
                 System.out.println("Клиент " + socket.getRemoteSocketAddress() + " подключился");
                 ClientHandler clientHandler = new ClientHandler(this, socket);
                 clientList.add(clientHandler);
-                new Thread(clientHandler).start();
+                executorService.execute(clientHandler);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -42,8 +49,8 @@ public class Server {
                 e.printStackTrace();
             }
             jdbcRegistrationProvider.disconnect();
+            executorService.shutdown();
         }
-
     }
 
 
@@ -85,7 +92,7 @@ public class Server {
      * Рассылает сообщение слиентам в списке clientHandler-ов
      * @param msg
      */
-    public void sendBroadcastMsg(String msg) {
+    public synchronized void sendBroadcastMsg(String msg) {
         for (ClientHandler client: clientList) {
             if (!client.getLogin().equals("")) {
                 client.writeOut(msg);
