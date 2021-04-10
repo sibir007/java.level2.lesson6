@@ -1,11 +1,16 @@
 package ru.geekbrains.java.level2.chat.server;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 
 public class ClientHandler implements Runnable {
+    //Trace < Debug < Info < Warn < Error < Fatal
+    private static final Logger logger = LogManager.getLogger(ClientHandler.class);
     private Server server;
     private Socket socket;
     private DataInputStream in;

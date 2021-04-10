@@ -1,8 +1,13 @@
 package ru.geekbrains.java.level2.chat.server;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.sql.*;
 
 public class JdbcRegistrationProvider {
+    //Trace < Debug < Info < Warn < Error < Fatal
+    private static final Logger logger = LogManager.getLogger(JdbcRegistrationProvider.class);
     private Connection connection;
     private Statement stmt;
     private PreparedStatement psInsert;
