@@ -1,5 +1,6 @@
 package ru.geekbrains.java.level2.chat.server;
 
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -34,12 +35,12 @@ public class ClientHandler implements Runnable {
             try {
                 this.socket.close();
             } catch (IOException ioException) {
-                ioException.printStackTrace();
+                logger.throwing(Level.ERROR, ioException);
             }
         }
     }
 
-   public String getLogin() {
+    public String getLogin() {
         return login;
     }
 
@@ -57,7 +58,7 @@ public class ClientHandler implements Runnable {
             //цикл регистрации и авторизации
             while (true) {
                 String regLogMsg = in.readUTF();
-                if (regLogMsg.startsWith("/reg")){
+                if (regLogMsg.startsWith("/reg")) {
                     regMsgHandler(regLogMsg);
                     continue;
                 }
@@ -73,11 +74,13 @@ public class ClientHandler implements Runnable {
                             msgDispatcher(msg);
                         }
                     }
-                };
+                }
+                ;
             }
 
 
         } catch (IOException e) {
+            logger.throwing(Level.ERROR, e);
             closeConnection(e);
         }
     }
@@ -86,7 +89,7 @@ public class ClientHandler implements Runnable {
     /**
      * обработка регистрации "/reg name_Дима login_dima password_1111"
      */
-    private boolean regMsgHandler(String msg){
+    private boolean regMsgHandler(String msg) {
         String[] regData = msg.split(" ");
         String name = regData[1].split("_")[1];
         String login = regData[2].split("_")[1];
@@ -168,11 +171,11 @@ public class ClientHandler implements Runnable {
             return;
         }
         String message = msg.substring(msg.indexOf(" ") + 1);
-        server.sendMsgOneUser(targetUserLogin,getLogin() + " -> " + message);
+        server.sendMsgOneUser(targetUserLogin, getLogin() + " -> " + message);
     }
 
     /**
-     *обработчик выхода пользователя из учётной записи "/logout"
+     * обработчик выхода пользователя из учётной записи "/logout"
      */
     private void logoutHandler() {
         this.login = "";
@@ -198,13 +201,12 @@ public class ClientHandler implements Runnable {
      * Печатает StackTrace
      */
     public void closeConnection(IOException e) {
-        e.printStackTrace();
         try {
             socket.close();
         } catch (IOException ioException) {
-            ioException.printStackTrace();
+            logger.throwing(Level.ERROR, ioException);
         }
-        System.out.println("соединение с клиентом " + socket.getRemoteSocketAddress() + " разорвано, socket закрыт");
+        logger.info("соединение с клиентом " + socket.getRemoteSocketAddress() + " разорвано, socket закрыт");
         server.removeClientHandlerFromList(this);
         String loginList = server.getLoginList();
         server.sendBroadcastMsg("/login_list " + loginList);

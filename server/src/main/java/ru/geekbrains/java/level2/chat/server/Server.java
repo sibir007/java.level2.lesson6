@@ -1,5 +1,6 @@
 package ru.geekbrains.java.level2.chat.server;
 
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -37,10 +38,10 @@ public class Server {
 
         try {
             serverSocket = new ServerSocket(port);
-            System.out.println("Сервер запущен на порту 8189. Ожидаем подключения клиентов ...");
+            logger.info("Сервер запущен на порту 8189. Ожидаем подключения клиентов ...");
             while (true) {
                 Socket socket = serverSocket.accept();
-                System.out.println("Клиент " + socket.getRemoteSocketAddress() + " подключился");
+                logger.info("Клиент " + socket.getRemoteSocketAddress() + " подключился");
                 ClientHandler clientHandler = new ClientHandler(this, socket);
                 clientList.add(clientHandler);
                 executorService.execute(clientHandler);
@@ -51,7 +52,7 @@ public class Server {
             try {
                 serverSocket.close();
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.throwing(Level.ERROR, e);
             }
             jdbcRegistrationProvider.disconnect();
             executorService.shutdown();
@@ -66,8 +67,7 @@ public class Server {
      */
     public void removeClientHandlerFromList (ClientHandler clientHandler) {
         clientList.remove(clientHandler);
-
-        System.out.println("clientHandler клиента " + clientHandler.getSocket().getRemoteSocketAddress() + " удалён из списка расслылки");
+        logger.info("clientHandler клиента " + clientHandler.getSocket().getRemoteSocketAddress() + " удалён из списка расслылки");
     }
 
     /**
@@ -76,7 +76,7 @@ public class Server {
     public synchronized boolean logging (ClientHandler clientHandler, String login, String password) {
         if (jdbcRegistrationProvider.checkLoginAndPassword(login, password)) {
             clientHandler.setLogin(login);
-            System.out.println("Клиент " + clientHandler.getSocket().getRemoteSocketAddress() + " залогинился, логин: " + login);
+            logger.info("Клиент " + clientHandler.getSocket().getRemoteSocketAddress() + " залогинился, логин: " + login);
             return true;
         }
         return false;

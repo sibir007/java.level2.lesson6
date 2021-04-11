@@ -1,5 +1,6 @@
 package ru.geekbrains.java.level2.chat.server;
 
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -25,7 +26,7 @@ public class JdbcRegistrationProvider {
                     "    password TEXT\n" +
                     ");");
         } catch (ClassNotFoundException | SQLException e) {
-            e.printStackTrace();
+            logger.throwing(Level.ERROR, e);
             throw new RuntimeException("Невозможно подключиться к БД");
         }
 //        disconnect();
@@ -37,20 +38,20 @@ public class JdbcRegistrationProvider {
                 stmt.close();
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.throwing(Level.ERROR, e);
         }
         try {
             if (psInsert != null) {
                 psInsert.close();
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.throwing(Level.ERROR, e);
         }
         if (connection != null) {
             try {
                 connection.close();
             } catch (SQLException throwables) {
-                throwables.printStackTrace();
+                logger.throwing(Level.ERROR, throwables);
             }
         }
     }
@@ -64,7 +65,7 @@ public class JdbcRegistrationProvider {
                     login,
                     password));
         } catch (SQLException throwables) {
-            throwables.printStackTrace();
+            logger.throwing(Level.ERROR, throwables);
         }
         return true;
     }
@@ -74,13 +75,13 @@ public class JdbcRegistrationProvider {
                 return true;
             }
         } catch (SQLException throwables) {
-            throwables.printStackTrace();
+            logger.throwing(Level.ERROR, throwables);
         }
         return false;
     }
 
     public boolean checkLoginAndPassword (String login, String password) {
-        System.out.println(login +" " + password);
+        logger.debug(login +" " + password);
         try (ResultSet rs = stmt.executeQuery("select * from users;")) {
             while (rs.next()) {
                 if (rs.getString("login").equals(login)
@@ -89,7 +90,7 @@ public class JdbcRegistrationProvider {
                 }
             }
         } catch (SQLException throwables) {
-            throwables.printStackTrace();
+            logger.throwing(Level.ERROR, throwables);
         }
         return false;
     }
